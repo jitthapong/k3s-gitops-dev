@@ -22,9 +22,9 @@ spec:
           name: http
         env:
         - name: PODINFO_UI_COLOR
-          value: "#3498db" # เปลี่ยนสีธีมหน้าเว็บเป็นสีฟ้าสดใสผ่าน Env
+          value: "#e74c3c" # เปลี่ยนสีธีมหน้าเว็บเป็นสีฟ้าสดใสผ่าน Env
         - name: PODINFO_UI_MESSAGE
-          value: "สวัสดีคุณ Jitthapong ยินดีต้อนรับสู่ K3s Cluster!"
+          value: "เจ๋งสัดๆ"
         resources:
           limits:
             memory: "128Mi"
