@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podinfo
+  labels:
+    app: podinfo
+spec:
+  replicas: 3 # รันพร้อมกัน 3 Pods ไปเลย จะได้เห็นพลัง Load Balancing ชัดๆ
+  selector:
+    matchLabels:
+      app: podinfo
+  template:
+    metadata:
+      labels:
+        app: podinfo
+    spec:
+      containers:
+      - name: podinfod
+        image: ghcr.io/stefanprodan/podinfo:6.7.0 # อิมเมจตัวเด็ดสำหรับทดสอบระบบ
+        ports:
+        - containerPort: 9898
+          name: http
+        env:
+        - name: PODINFO_UI_COLOR
+          value: "#3498db" # เปลี่ยนสีธีมหน้าเว็บเป็นสีฟ้าสดใสผ่าน Env
+        - name: PODINFO_UI_MESSAGE
+          value: "สวัสดีคุณ Jitthapong ยินดีต้อนรับสู่ K3s Cluster!"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podinfo
+spec:
+  type: ClusterIP
+  selector:
+    app: podinfo
+  ports:
+    - protocol: TCP
+      port: 9898
+      targetPort: 9898
+      name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: podinfo
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: podinfo.127.0.0.1.sslip.io # Domain สำหรับกดเข้าเล่น
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: podinfo
+            port:
+              name: http
